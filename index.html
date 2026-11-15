@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Video Emozionali</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f4f4f9; text-align: center; padding: 20px; }
+        #contenitore { max-width: 800px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        iframe { width: 100%; height: 450px; border: none; border-radius: 5px; margin-bottom: 20px; }
+        .rating-btn { padding: 10px 20px; margin: 5px; font-size: 16px; cursor: pointer; border: 1px solid #ccc; background: white; border-radius: 5px; transition: 0.2s; }
+        .rating-btn:hover, .rating-btn.selezionato { background: #007BFF; color: white; border-color: #007BFF; }
+        #btn-avanti { display: none; margin-top: 20px; padding: 10px 30px; font-size: 18px; background: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+<div id="contenitore">
+    <h2 id="titolo">Caricamento test in corso...</h2>
+    
+    <!-- Qui apparirà il video -->
+    <div id="player-container" style="display: none;">
+        <iframe id="video-iframe" src="" allowfullscreen></iframe>
+        
+        <h3>Come valuti l'intensità di questo video? (1 = Bassa, 7 = Alta)</h3>
+        <div id="pulsanti-voto">
+            <!-- Pulsanti generati dal codice JavaScript -->
+        </div>
+        
+        <button id="btn-avanti" onclick="prossimoVideo()">Prossimo Video</button>
+    </div>
+
+    <!-- Messaggio finale -->
+    <div id="messaggio-fine" style="display: none;">
+        <h2>Test completato!</h2>
+        <p>Stiamo salvando i tuoi risultati...</p>
+    </div>
+</div>
+
+<script>
+    // 1. INCOLLA QUI IL TUO LINK DI GOOGLE APPS SCRIPT
+    const URL_GOOGLE_SCRIPT = "https://script.google.com/macros/s/AKfycbx2edQLOSQK3nr5GRefZc1BUcLFTR81f-H1YTv8jRwuwAjTJeG5m1aZ-Rte-ISjkC8yog/exec";
+
+    // 2. I TUOI DATASET DI VIDEO 
+    const databaseVideo = {
+        Gioia: [
+            "https://drive.google.com/file/d/1Ncuafjaer2G68xahXM-83LjsiFaiHpvr/preview", 
+            "https://drive.google.com/file/d/1ZOP8w-8VCgqnq-Sw8Pd5wudub_-zdXPN/preview",
+            "https://drive.google.com/file/d/1NyJFhMldpSQrOLiezQKcYkF69DM7yXjT/preview",
+            "https://drive.google.com/file/d/1YllP-rN9w-7UaH5YV6Qwip7ujFK1jMb1/preview",
+            "https://drive.google.com/file/d/18E6w5gy1cx7S8HNNoF8sAFJO2T5npPXI/preview",
+            "https://drive.google.com/file/d/1q9q3IO1fHfPetb89xX9XEP7spLqUPQOB/preview",
+            "https://drive.google.com/file/d/1mY-GpzCWbHKnvqlPIPcfclzNaCeWhoGA/preview",
+            "https://drive.google.com/file/d/1YJbPH-Tk8lZSD92orDy4CQs2UX8eVnL2/preview"
+        ],
+        Tristezza: [
+            "https://drive.google.com/file/d/1UjM3A2tlOlYAMQCguqxqX1LY3QdhRgNe/preview", 
+            "https://drive.google.com/file/d/16l_c-5cfWdIYGAKm2591B5q8CfIAivvu/preview",
+            "https://drive.google.com/file/d/1VWjeSNmlSi7mMcSu6LzUpy6KAOTUbA3B/preview", 
+            "https://drive.google.com/file/d/1Ft8qYcssK63iLcNNQVGpGUrTuxEp8TDN/preview", 
+            "https://drive.google.com/file/d/1L_pA-xJF3vuLyyqraV8InBKZP6Klq3zT/preview"
+        ],
+        Disgusto: [
+            "https://drive.google.com/file/d/1NT7DxqmL6xHrfwjHoS5Z4mo-vQ2LFwGV/preview",
+            "https://drive.google.com/file/d/1GFmzM3_bwuDIROCmNoPmIUDbDknvMwtn/preview",
+            "https://drive.google.com/file/d/1NhH8jCYllssRLI23XR3gCr4Hkw9cg4yH/preview",
+            "https://drive.google.com/file/d/14My8-5aI25eYPrcmdW6bWvZ3sKvmiED2/preview",
+            "https://drive.google.com/file/d/1EkBb3yqrL7uh1yTCGqt79OrSaYP7EEtm/preview",
+            "https://drive.google.com/file/d/1dtdtOeohWY27zqYTEvJXHQ-wr8Xa13n8/preview"
+        ],
+        Rabbia: [
+            "https://drive.google.com/file/d/1tREanq2SeLoYqXj5cN2SgBDHs6KJrVsn/preview",
+            "https://drive.google.com/file/d/1757uc_WEKbiMO2rjx-Pww0UapS_1_ivM/preview",
+            "https://drive.google.com/file/d/1RPqLVSJqUT5Hm_JLP7SMZ8r5FJEcI2LQ/preview",
+            "https://drive.google.com/file/d/1R8LcAgBZTrgJ-jZRj2ClJc_zzaYhuspx/preview",
+            "https://drive.google.com/file/d/1OpADOQDkPNB3W0B1K9867F9E754JFaox/preview",
+            "https://drive.google.com/file/d/1SkTttKYrIgQ8uxaLwW9C-xtf9sw2-xqL/preview",
+            "https://drive.google.com/file/d/1w-Kl9HG1HtHMtquGAr0VFV6kEILb1JEo/preview"
+        ],
+        Paura: [
+            "https://drive.google.com/file/d/1CMHpMVJ05ZuJ9IY8THpRyQWB7knz3rp-/preview",
+            "https://drive.google.com/file/d/1Bxa9SfT5D6EE7OPCAankyyaG5H_VoeTq/preview",
+            "https://drive.google.com/file/d/1EqQ9CLlrtu6c-COf1wSt9YRn4zck4Toa/preview",
+            "https://drive.google.com/file/d/1ckeFHmzGWtH_hl1GusDzphoaRjhVUsa_/preview",
+            "https://drive.google.com/file/d/1xMdRBkHGh4dumHrbNNf6BFVNQsiFdKIX/preview",
+            "https://drive.google.com/file/d/1T7oWFAgOL1EDgvXs2UwohscKyhd1hynJ/preview"
+        ]
+    };
+
+    let playlistUtente = [];
+    let indiceAttuale = 0;
+    let risposteUtente = [];
+    let votoTemporaneo = null;
+
+    // Funzione per pescare 1 elemento a caso da un array
+    function pescaACaso(array) {
+        return array[Math.floor(Math.random() * array.length)];
+    }
+
+    // Funzione per mescolare l'ordine dei video (Fisher-Yates Shuffle)
+    function mescolaArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
+
+    // Inizializza il test
+    function avviaTest() {
+        // Estraiamo 1 video a caso per ogni emozione
+        let videoSelezionati = [
+            { emozione: "Gioia", url: pescaACaso(databaseVideo.Gioia) },
+            { emozione: "Tristezza", url: pescaACaso(databaseVideo.Tristezza) },
+            { emozione: "Disgusto", url: pescaACaso(databaseVideo.Disgusto) },
+            { emozione: "Rabbia", url: pescaACaso(databaseVideo.Rabbia) },
+            { emozione: "Paura", url: pescaACaso(databaseVideo.Paura) }
+        ];
+
+        // Mescoliamo i 5 video estratti
+        playlistUtente = mescolaArray(videoSelezionati);
+
+        // Generiamo i tasti da 1 a 7
+        const contenitoreVoti = document.getElementById("pulsanti-voto");
+        for(let i=1; i<=7; i++) {
+            let btn = document.createElement("button");
+            btn.innerText = i;
+            btn.className = "rating-btn";
+            btn.onclick = () => selezionaVoto(i, btn);
+            contenitoreVoti.appendChild(btn);
+        }
+
+        mostraVideo();
+    }
+
+    function mostraVideo() {
+        document.getElementById("titolo").innerText = `Video ${indiceAttuale + 1} di 5`;
+        document.getElementById("player-container").style.display = "block";
+        
+        // Imposta il video corrente nell'iframe
+        document.getElementById("video-iframe").src = playlistUtente[indiceAttuale].url;
+        
+        // Resetta le scelte
+        votoTemporaneo = null;
+        document.getElementById("btn-avanti").style.display = "none";
+        document.querySelectorAll(".rating-btn").forEach(b => b.classList.remove("selezionato"));
+    }
+
+    function selezionaVoto(voto, elementoBtn) {
+        votoTemporaneo = voto;
+        // Colora il tasto cliccato
+        document.querySelectorAll(".rating-btn").forEach(b => b.classList.remove("selezionato"));
+        elementoBtn.classList.add("selezionato");
+        // Mostra il tasto avanti
+        document.getElementById("btn-avanti").style.display = "inline-block";
+    }
+
+    function prossimoVideo() {
+        // Salva la risposta di questo video
+        risposteUtente.push({
+            emozione: playlistUtente[indiceAttuale].emozione,
+            video: playlistUtente[indiceAttuale].url,
+            voto: votoTemporaneo
+        });
+
+        indiceAttuale++;
+
+        if (indiceAttuale < 5) {
+            mostraVideo();
+        } else {
+            inviaDati();
+        }
+    }
+
+    function inviaDati() {
+        document.getElementById("player-container").style.display = "none";
+        document.getElementById("titolo").style.display = "none";
+        const msgFine = document.getElementById("messaggio-fine");
+        msgFine.style.display = "block";
+
+        // Prepariamo il pacchetto dati
+        const datiDaInviare = {
+            idUtente: "Utente_" + Math.floor(Math.random() * 10000), // Genera ID fittizio per l'utente
+            risposte: risposteUtente
+        };
+
+        // Spediamo a Google
+        fetch(URL_GOOGLE_SCRIPT, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify(datiDaInviare)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if(data.status === "successo") {
+                msgFine.innerHTML = "<h2>Grazie!</h2><p>Le tue risposte sono state registrate con successo.</p>";
+            } else {
+                msgFine.innerHTML = "<h2>Errore</h2><p>C'è stato un problema nel salvataggio. Riprova.</p>";
+            }
+        })
+        .catch(error => {
+            msgFine.innerHTML = "<h2>Errore di rete</h2><p>Controlla la tua connessione.</p>";
+        });
+    }
+
+    // Facciamo partire il test al caricamento della pagina
+    window.onload = avviaTest;
+</script>
+
+</body>
+</html>
