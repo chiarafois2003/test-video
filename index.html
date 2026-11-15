@@ -5,24 +5,369 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Test Video Emozionali</title>
     <style>
-        body { font-family: Arial, sans-serif; background: #f4f4f9; text-align: center; padding: 20px; }
-        #contenitore { max-width: 800px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        iframe { width: 100%; height: 450px; border: none; border-radius: 5px; margin-bottom: 20px; }
-        .rating-btn { padding: 10px 20px; margin: 5px; font-size: 16px; cursor: pointer; border: 1px solid #ccc; background: white; border-radius: 5px; transition: 0.2s; }
-        .rating-btn:hover, .rating-btn.selezionato { background: #007BFF; color: white; border-color: #007BFF; }
-        #btn-avanti { display: none; margin-top: 20px; padding: 10px 30px; font-size: 18px; background: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background: #f4f4f9;
+            color: #222;
+            text-align: center;
+            margin: 0;
+            padding: 16px 12px;
+            -webkit-text-size-adjust: 100%;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        #contenitore {
+            max-width: 760px;
+            width: 100%;
+            margin: 10px auto;
+            background: #ffffff;
+            padding: 28px 24px;
+            border-radius: 12px;
+            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
+        }
+
+        h2 {
+            font-size: 1.4rem;
+            margin-top: 0;
+            margin-bottom: 16px;
+            color: #222;
+        }
+
+        h3 {
+            font-size: 1.1rem;
+            margin-top: 24px;
+            margin-bottom: 12px;
+            color: #333;
+            line-height: 1.4;
+        }
+
+        /* Contenitore Video Personalizzato */
+        .custom-video-box {
+            position: relative;
+            width: 100%;
+            margin: 0 auto 20px auto;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #000000;
+            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.15);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        #video-player {
+            width: 100%;
+            height: auto;
+            max-height: 65vh;
+            display: block;
+            background: #000000;
+        }
+
+        /* Singolo pulsante Play / Pausa al centro */
+        .center-play-button {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 68px;
+            height: 68px;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.25s ease, transform 0.25s ease;
+            pointer-events: none;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+        }
+
+        .custom-video-box.playing .center-play-button {
+            opacity: 0;
+            transform: translate(-50%, -50%) scale(0.85);
+        }
+
+        .custom-video-box.paused .center-play-button {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        /* Rotellina di caricamento (Spinner) */
+        .video-spinner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 48px;
+            height: 48px;
+            border: 4px solid rgba(255, 255, 255, 0.25);
+            border-top-color: #ffffff;
+            border-radius: 50%;
+            animation: spinner-rotazione 0.8s linear infinite;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        @keyframes spinner-rotazione {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        /* Pulsanti Emozioni */
+        #pulsanti-emozione {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+            margin: 0 auto 10px auto;
+            max-width: 600px;
+        }
+
+        .emotion-btn {
+            flex: 1 1 calc(33.333% - 10px);
+            min-width: 105px;
+            min-height: 46px;
+            padding: 10px 14px;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            border: 1.5px solid #d0d7de;
+            background: #ffffff;
+            color: #24292f;
+            border-radius: 8px;
+            transition: all 0.15s ease;
+            touch-action: manipulation;
+        }
+
+        /* Pulsanti Voto (1 - 5) */
+        #pulsanti-voto {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin: 0 auto 10px auto;
+            max-width: 420px;
+            width: 100%;
+        }
+
+        .rating-btn {
+            flex: 1;
+            min-height: 48px;
+            padding: 10px 0;
+            font-size: 17px;
+            font-weight: 600;
+            cursor: pointer;
+            border: 1.5px solid #d0d7de;
+            background: #ffffff;
+            color: #24292f;
+            border-radius: 8px;
+            transition: all 0.15s ease;
+            touch-action: manipulation;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Stati di selezione e hover */
+        .rating-btn.selezionato, .emotion-btn.selezionato {
+            background: #007BFF;
+            color: #ffffff;
+            border-color: #007BFF;
+            box-shadow: 0 2px 8px rgba(0, 123, 255, 0.35);
+        }
+
+        @media (hover: hover) {
+            .rating-btn:hover:not(.selezionato), .emotion-btn:hover:not(.selezionato) {
+                background: #f0f7ff;
+                border-color: #70b5ff;
+            }
+        }
+
+        .rating-btn:active, .emotion-btn:active {
+            transform: scale(0.97);
+        }
+
+        /* Pulsanti Azione Principali */
+        #btn-avanti {
+            display: none;
+            width: 100%;
+            max-width: 320px;
+            margin: 25px auto 10px auto;
+            padding: 14px 24px;
+            font-size: 17px;
+            font-weight: 600;
+            background: #28a745;
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 3px 10px rgba(40, 167, 69, 0.3);
+            transition: background 0.2s, transform 0.1s;
+            touch-action: manipulation;
+        }
+
+        #btn-avanti:hover {
+            background: #218838;
+        }
+
+        #btn-avanti:active, .btn-principale:active {
+            transform: scale(0.98);
+        }
+
+        .btn-principale {
+            width: 100%;
+            max-width: 320px;
+            padding: 14px 24px;
+            font-size: 17px;
+            font-weight: 600;
+            background: #007BFF;
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 3px 10px rgba(0, 123, 255, 0.3);
+            transition: background 0.2s, transform 0.1s;
+            margin-top: 10px;
+            touch-action: manipulation;
+        }
+
+        .btn-principale:hover {
+            background: #0056b3;
+        }
+
+        /* Istruzioni e avvisi */
+        .box-intro {
+            text-align: left;
+            line-height: 1.6;
+            font-size: 15px;
+            color: #333;
+            margin: 18px 0;
+        }
+
+        .box-intro ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+
+        .box-intro li {
+            margin-bottom: 8px;
+        }
+
+        .warning-box {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeeba;
+            padding: 12px 14px;
+            border-radius: 8px;
+            margin: 18px 0;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        /* Ottimizzazioni per schermi piccoli (Mobile) */
+        @media (max-width: 480px) {
+            body {
+                padding: 8px 6px;
+            }
+
+            #contenitore {
+                padding: 18px 14px;
+                border-radius: 10px;
+            }
+
+            h2 {
+                font-size: 1.25rem;
+            }
+
+            h3 {
+                font-size: 1rem;
+                margin-top: 20px;
+            }
+
+            #video-player {
+                max-height: 58vh;
+            }
+
+            .custom-video-box {
+                margin-bottom: 16px;
+            }
+
+            .emotion-btn {
+                flex: 1 1 calc(50% - 8px); /* 2 colonne ordinate su mobile */
+                min-width: 0;
+                font-size: 14px;
+                padding: 10px 6px;
+            }
+
+            .rating-btn {
+                min-height: 44px;
+                font-size: 16px;
+            }
+
+            .box-intro {
+                font-size: 14px;
+            }
+        }
     </style>
 </head>
 <body>
 
 <div id="contenitore">
-    <h2 id="titolo">Caricamento test in corso...</h2>
+    <!-- Schermata di caricamento iniziale -->
+    <h2 id="titolo-caricamento">Caricamento test in corso...</h2>
+
+    <!-- Schermata iniziale di introduzione -->
+    <div id="schermata-iniziale" style="display: none;">
+        <h2>Test sulle aree emotive</h2>
+        <div class="box-intro">
+            <p>Ciao! Siamo un gruppo di studenti del corso di Design della Comunicazione presso il Politecnico di Milano. Questo test fa parte di una ricerca per il nostro progetto di <strong>Speculative Design</strong>.</p>
+            
+            <p><strong>Cosa ti aspetta:</strong></p>
+            <ul>
+                <li>Visualizzerai <strong>5 brevi video</strong> estratti casualmente.</li>
+                <li>Per ogni video ti chiederemo di indicare <strong>quale emozione</strong> percepisci e di valutarne l'<strong>intensità</strong>.</li>
+                <li>Il test richiederà circa <strong>3 minuti</strong> in totale.</li>
+            </ul>
+
+            <p>🎧 Ti consigliamo di indossare le <strong>cuffie</strong> per un'esperienza più immersiva.</p>
+
+            <div class="warning-box">
+                ⚠️ <strong>Trigger Warning:</strong> Alcuni video potrebbero contenere scene dal contenuto <strong>esplicito</strong>. Se in qualunque momento non dovessi sentirti a tuo agio, puoi liberamente interrompere il video e procedere con il test.
+            </div>
+        </div>
+
+        <button id="btn-inizia" class="btn-principale" onclick="iniziaTest()">Inizia il Test</button>
+    </div>
+    
+    <h2 id="titolo" style="display: none;"></h2>
     
     <!-- Qui apparirà il video -->
     <div id="player-container" style="display: none;">
-        <iframe id="video-iframe" src="" allowfullscreen></iframe>
+        <div id="video-wrapper" class="custom-video-box paused" onclick="togglePlay()">
+            <video id="video-player" playsinline preload="auto"></video>
+            
+            <!-- Rotellina di caricamento (Spinner) -->
+            <div id="video-spinner" class="video-spinner" style="display: none;"></div>
+
+            <!-- Pulsante centrale Play / Pausa / Replay -->
+            <div id="center-play-button" class="center-play-button">
+                <svg id="play-svg" width="30" height="30" viewBox="0 0 24 24" fill="#ffffff" style="margin-left: 3px;"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                <svg id="pause-svg" width="28" height="28" viewBox="0 0 24 24" fill="#ffffff" style="display: none;"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>
+                <svg id="replay-svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display: none;"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+            </div>
+        </div>
         
-        <h3>Come valuti l'intensità di questo video? (1 = Bassa, 7 = Alta)</h3>
+        <h3>Quale emozione vedi rappresentata nel video?</h3>
+        <div id="pulsanti-emozione">
+            <!-- Pulsanti emozioni generati dal codice JavaScript -->
+        </div>
+
+        <h3>Come valuti l'intensità di questo video? (1 = Bassa, 5 = Alta)</h3>
         <div id="pulsanti-voto">
             <!-- Pulsanti generati dal codice JavaScript -->
         </div>
@@ -44,52 +389,55 @@
     // 2. I TUOI DATASET DI VIDEO 
     const databaseVideo = {
         Gioia: [
-            "https://drive.google.com/file/d/1Ncuafjaer2G68xahXM-83LjsiFaiHpvr/preview", 
-            "https://drive.google.com/file/d/1ZOP8w-8VCgqnq-Sw8Pd5wudub_-zdXPN/preview",
-            "https://drive.google.com/file/d/1NyJFhMldpSQrOLiezQKcYkF69DM7yXjT/preview",
-            "https://drive.google.com/file/d/1YllP-rN9w-7UaH5YV6Qwip7ujFK1jMb1/preview",
-            "https://drive.google.com/file/d/18E6w5gy1cx7S8HNNoF8sAFJO2T5npPXI/preview",
-            "https://drive.google.com/file/d/1q9q3IO1fHfPetb89xX9XEP7spLqUPQOB/preview",
-            "https://drive.google.com/file/d/1mY-GpzCWbHKnvqlPIPcfclzNaCeWhoGA/preview",
-            "https://drive.google.com/file/d/1YJbPH-Tk8lZSD92orDy4CQs2UX8eVnL2/preview"
+            { file: "videos/gioia_1.mp4", driveUrl: "https://drive.google.com/file/d/1Ncuafjaer2G68xahXM-83LjsiFaiHpvr/preview" },
+            { file: "videos/gioia_2.mp4", driveUrl: "https://drive.google.com/file/d/1ZOP8w-8VCgqnq-Sw8Pd5wudub_-zdXPN/preview" },
+            { file: "videos/gioia_3.mp4", driveUrl: "https://drive.google.com/file/d/1NyJFhMldpSQrOLiezQKcYkF69DM7yXjT/preview" },
+            { file: "videos/gioia_4.mp4", driveUrl: "https://drive.google.com/file/d/1YllP-rN9w-7UaH5YV6Qwip7ujFK1jMb1/preview" },
+            { file: "videos/gioia_5.mp4", driveUrl: "https://drive.google.com/file/d/18E6w5gy1cx7S8HNNoF8sAFJO2T5npPXI/preview" },
+            { file: "videos/gioia_6.mp4", driveUrl: "https://drive.google.com/file/d/1q9q3IO1fHfPetb89xX9XEP7spLqUPQOB/preview" },
+            { file: "videos/gioia_7.mp4", driveUrl: "https://drive.google.com/file/d/1mY-GpzCWbHKnvqlPIPcfclzNaCeWhoGA/preview" },
+            { file: "videos/gioia_8.mp4", driveUrl: "https://drive.google.com/file/d/1YJbPH-Tk8lZSD92orDy4CQs2UX8eVnL2/preview" }
         ],
         Tristezza: [
-            "https://drive.google.com/file/d/1UjM3A2tlOlYAMQCguqxqX1LY3QdhRgNe/preview", 
-            "https://drive.google.com/file/d/16l_c-5cfWdIYGAKm2591B5q8CfIAivvu/preview",
-            "https://drive.google.com/file/d/1VWjeSNmlSi7mMcSu6LzUpy6KAOTUbA3B/preview", 
-            "https://drive.google.com/file/d/1Ft8qYcssK63iLcNNQVGpGUrTuxEp8TDN/preview", 
-            "https://drive.google.com/file/d/1L_pA-xJF3vuLyyqraV8InBKZP6Klq3zT/preview"
+            { file: "videos/tristezza_1.mp4", driveUrl: "https://drive.google.com/file/d/1UjM3A2tlOlYAMQCguqxqX1LY3QdhRgNe/preview" },
+            { file: "videos/tristezza_2.mp4", driveUrl: "https://drive.google.com/file/d/16l_c-5cfWdIYGAKm2591B5q8CfIAivvu/preview" },
+            { file: "videos/tristezza_3.mp4", driveUrl: "https://drive.google.com/file/d/1VWjeSNmlSi7mMcSu6LzUpy6KAOTUbA3B/preview" },
+            { file: "videos/tristezza_4.mp4", driveUrl: "https://drive.google.com/file/d/1Ft8qYcssK63iLcNNQVGpGUrTuxEp8TDN/preview" },
+            { file: "videos/tristezza_5.mp4", driveUrl: "https://drive.google.com/file/d/1L_pA-xJF3vuLyyqraV8InBKZP6Klq3zT/preview" }
         ],
         Disgusto: [
-            "https://drive.google.com/file/d/1NT7DxqmL6xHrfwjHoS5Z4mo-vQ2LFwGV/preview",
-            "https://drive.google.com/file/d/1GFmzM3_bwuDIROCmNoPmIUDbDknvMwtn/preview",
-            "https://drive.google.com/file/d/1NhH8jCYllssRLI23XR3gCr4Hkw9cg4yH/preview",
-            "https://drive.google.com/file/d/14My8-5aI25eYPrcmdW6bWvZ3sKvmiED2/preview",
-            "https://drive.google.com/file/d/1EkBb3yqrL7uh1yTCGqt79OrSaYP7EEtm/preview",
-            "https://drive.google.com/file/d/1dtdtOeohWY27zqYTEvJXHQ-wr8Xa13n8/preview"
+            { file: "videos/disgusto_1.mp4", driveUrl: "https://drive.google.com/file/d/1NT7DxqmL6xHrfwjHoS5Z4mo-vQ2LFwGV/preview" },
+            { file: "videos/disgusto_2.mp4", driveUrl: "https://drive.google.com/file/d/1GFmzM3_bwuDIROCmNoPmIUDbDknvMwtn/preview" },
+            { file: "videos/disgusto_3.mp4", driveUrl: "https://drive.google.com/file/d/1NhH8jCYllssRLI23XR3gCr4Hkw9cg4yH/preview" },
+            { file: "videos/disgusto_4.mp4", driveUrl: "https://drive.google.com/file/d/14My8-5aI25eYPrcmdW6bWvZ3sKvmiED2/preview" },
+            { file: "videos/disgusto_5.mp4", driveUrl: "https://drive.google.com/file/d/1EkBb3yqrL7uh1yTCGqt79OrSaYP7EEtm/preview" },
+            { file: "videos/disgusto_6.mp4", driveUrl: "https://drive.google.com/file/d/1dtdtOeohWY27zqYTEvJXHQ-wr8Xa13n8/preview" }
         ],
         Rabbia: [
-            "https://drive.google.com/file/d/1tREanq2SeLoYqXj5cN2SgBDHs6KJrVsn/preview",
-            "https://drive.google.com/file/d/1757uc_WEKbiMO2rjx-Pww0UapS_1_ivM/preview",
-            "https://drive.google.com/file/d/1RPqLVSJqUT5Hm_JLP7SMZ8r5FJEcI2LQ/preview",
-            "https://drive.google.com/file/d/1R8LcAgBZTrgJ-jZRj2ClJc_zzaYhuspx/preview",
-            "https://drive.google.com/file/d/1OpADOQDkPNB3W0B1K9867F9E754JFaox/preview",
-            "https://drive.google.com/file/d/1SkTttKYrIgQ8uxaLwW9C-xtf9sw2-xqL/preview",
-            "https://drive.google.com/file/d/1w-Kl9HG1HtHMtquGAr0VFV6kEILb1JEo/preview"
+            { file: "videos/rabbia_1.mp4", driveUrl: "https://drive.google.com/file/d/1tREanq2SeLoYqXj5cN2SgBDHs6KJrVsn/preview" },
+            { file: "videos/rabbia_2.mp4", driveUrl: "https://drive.google.com/file/d/1757uc_WEKbiMO2rjx-Pww0UapS_1_ivM/preview" },
+            { file: "videos/rabbia_3.mp4", driveUrl: "https://drive.google.com/file/d/1RPqLVSJqUT5Hm_JLP7SMZ8r5FJEcI2LQ/preview" },
+            { file: "videos/rabbia_4.mp4", driveUrl: "https://drive.google.com/file/d/1R8LcAgBZTrgJ-jZRj2ClJc_zzaYhuspx/preview" },
+            { file: "videos/rabbia_5.mp4", driveUrl: "https://drive.google.com/file/d/1OpADOQDkPNB3W0B1K9867F9E754JFaox/preview" },
+            { file: "videos/rabbia_6.mp4", driveUrl: "https://drive.google.com/file/d/1SkTttKYrIgQ8uxaLwW9C-xtf9sw2-xqL/preview" },
+            { file: "videos/rabbia_7.mp4", driveUrl: "https://drive.google.com/file/d/1w-Kl9HG1HtHMtquGAr0VFV6kEILb1JEo/preview" }
         ],
         Paura: [
-            "https://drive.google.com/file/d/1CMHpMVJ05ZuJ9IY8THpRyQWB7knz3rp-/preview",
-            "https://drive.google.com/file/d/1Bxa9SfT5D6EE7OPCAankyyaG5H_VoeTq/preview",
-            "https://drive.google.com/file/d/1EqQ9CLlrtu6c-COf1wSt9YRn4zck4Toa/preview",
-            "https://drive.google.com/file/d/1ckeFHmzGWtH_hl1GusDzphoaRjhVUsa_/preview",
-            "https://drive.google.com/file/d/1xMdRBkHGh4dumHrbNNf6BFVNQsiFdKIX/preview",
-            "https://drive.google.com/file/d/1T7oWFAgOL1EDgvXs2UwohscKyhd1hynJ/preview"
+            { file: "videos/paura_1.mp4", driveUrl: "https://drive.google.com/file/d/1CMHpMVJ05ZuJ9IY8THpRyQWB7knz3rp-/preview" },
+            { file: "videos/paura_2.mp4", driveUrl: "https://drive.google.com/file/d/1Bxa9SfT5D6EE7OPCAankyyaG5H_VoeTq/preview" },
+            { file: "videos/paura_3.mp4", driveUrl: "https://drive.google.com/file/d/1EqQ9CLlrtu6c-COf1wSt9YRn4zck4Toa/preview" },
+            { file: "videos/paura_4.mp4", driveUrl: "https://drive.google.com/file/d/1ckeFHmzGWtH_hl1GusDzphoaRjhVUsa_/preview" },
+            { file: "videos/paura_5.mp4", driveUrl: "https://drive.google.com/file/d/1xMdRBkHGh4dumHrbNNf6BFVNQsiFdKIX/preview" },
+            { file: "videos/paura_6.mp4", driveUrl: "https://drive.google.com/file/d/1T7oWFAgOL1EDgvXs2UwohscKyhd1hynJ/preview" }
         ]
     };
+
+    const listaEmozioni = ["Gioia", "Tristezza", "Disgusto", "Paura", "Rabbia"];
 
     let playlistUtente = [];
     let indiceAttuale = 0;
     let risposteUtente = [];
+    let emozioneSelezionata = null;
     let votoTemporaneo = null;
 
     // Funzione per pescare 1 elemento a caso da un array
@@ -106,23 +454,66 @@
         return array;
     }
 
+    let haFinitoRiproduzione = false;
+
     // Inizializza il test
     function avviaTest() {
         // Estraiamo 1 video a caso per ogni emozione
         let videoSelezionati = [
-            { emozione: "Gioia", url: pescaACaso(databaseVideo.Gioia) },
-            { emozione: "Tristezza", url: pescaACaso(databaseVideo.Tristezza) },
-            { emozione: "Disgusto", url: pescaACaso(databaseVideo.Disgusto) },
-            { emozione: "Rabbia", url: pescaACaso(databaseVideo.Rabbia) },
-            { emozione: "Paura", url: pescaACaso(databaseVideo.Paura) }
+            { emozione: "Gioia", ...pescaACaso(databaseVideo.Gioia) },
+            { emozione: "Tristezza", ...pescaACaso(databaseVideo.Tristezza) },
+            { emozione: "Disgusto", ...pescaACaso(databaseVideo.Disgusto) },
+            { emozione: "Rabbia", ...pescaACaso(databaseVideo.Rabbia) },
+            { emozione: "Paura", ...pescaACaso(databaseVideo.Paura) }
         ];
 
         // Mescoliamo i 5 video estratti
         playlistUtente = mescolaArray(videoSelezionati);
 
-        // Generiamo i tasti da 1 a 7
+        // Collega gli eventi al player video nativo
+        const video = document.getElementById("video-player");
+
+        video.addEventListener("playing", () => {
+            mostraSpinner(false);
+            aggiornaIcone("pause");
+        });
+
+        video.addEventListener("waiting", () => {
+            mostraSpinner(true);
+        });
+
+        video.addEventListener("canplay", () => {
+            if (!video.paused) {
+                mostraSpinner(false);
+            }
+        });
+
+        video.addEventListener("pause", () => {
+            mostraSpinner(false);
+            if (!haFinitoRiproduzione) {
+                aggiornaIcone("play");
+            }
+        });
+
+        video.addEventListener("ended", () => {
+            haFinitoRiproduzione = true;
+            mostraSpinner(false);
+            aggiornaIcone("replay");
+        });
+
+        // Generiamo i tasti per le emozioni
+        const contenitoreEmozioni = document.getElementById("pulsanti-emozione");
+        listaEmozioni.forEach(emozione => {
+            let btn = document.createElement("button");
+            btn.innerText = emozione;
+            btn.className = "emotion-btn";
+            btn.onclick = () => selezionaEmozione(emozione, btn);
+            contenitoreEmozioni.appendChild(btn);
+        });
+
+        // Generiamo i tasti da 1 a 5
         const contenitoreVoti = document.getElementById("pulsanti-voto");
-        for(let i=1; i<=7; i++) {
+        for(let i=1; i<=5; i++) {
             let btn = document.createElement("button");
             btn.innerText = i;
             btn.className = "rating-btn";
@@ -130,36 +521,132 @@
             contenitoreVoti.appendChild(btn);
         }
 
+        // Mostriamo la schermata iniziale con le istruzioni
+        document.getElementById("titolo-caricamento").style.display = "none";
+        document.getElementById("schermata-iniziale").style.display = "block";
+    }
+
+    function mostraSpinner(mostra) {
+        const spinner = document.getElementById("video-spinner");
+        const centerBtn = document.getElementById("center-play-button");
+        if (!spinner || !centerBtn) return;
+
+        if (mostra) {
+            spinner.style.display = "block";
+            centerBtn.style.display = "none";
+        } else {
+            spinner.style.display = "none";
+            centerBtn.style.display = "flex";
+        }
+    }
+
+    function aggiornaIcone(stato) {
+        const box = document.getElementById("video-wrapper");
+        const playSvg = document.getElementById("play-svg");
+        const pauseSvg = document.getElementById("pause-svg");
+        const replaySvg = document.getElementById("replay-svg");
+
+        if (!box) return;
+
+        playSvg.style.display = "none";
+        pauseSvg.style.display = "none";
+        replaySvg.style.display = "none";
+
+        if (stato === "play") {
+            box.classList.remove("playing");
+            box.classList.add("paused");
+            playSvg.style.display = "block";
+        } else if (stato === "pause") {
+            box.classList.remove("paused");
+            box.classList.add("playing");
+            pauseSvg.style.display = "block";
+        } else if (stato === "replay") {
+            box.classList.remove("playing");
+            box.classList.add("paused");
+            replaySvg.style.display = "block";
+        }
+    }
+
+    function togglePlay() {
+        const video = document.getElementById("video-player");
+        if (!video.src) return;
+
+        // Se il video era terminato, riparte dall'inizio
+        if (haFinitoRiproduzione) {
+            haFinitoRiproduzione = false;
+            video.currentTime = 0;
+            mostraSpinner(true);
+            video.play().catch(() => mostraSpinner(false));
+            return;
+        }
+
+        if (video.paused) {
+            mostraSpinner(true);
+            video.play().catch(() => mostraSpinner(false));
+        } else {
+            video.pause();
+        }
+    }
+
+    function iniziaTest() {
+        document.getElementById("schermata-iniziale").style.display = "none";
+        document.getElementById("titolo").style.display = "block";
         mostraVideo();
     }
 
     function mostraVideo() {
+        window.scrollTo({ top: 0, behavior: "smooth" });
         document.getElementById("titolo").innerText = `Video ${indiceAttuale + 1} di 5`;
         document.getElementById("player-container").style.display = "block";
         
-        // Imposta il video corrente nell'iframe
-        document.getElementById("video-iframe").src = playlistUtente[indiceAttuale].url;
-        
+        haFinitoRiproduzione = false;
+        mostraSpinner(false);
+        aggiornaIcone("play");
+
+        const videoEl = document.getElementById("video-player");
+        videoEl.src = playlistUtente[indiceAttuale].file;
+        videoEl.load();
+
         // Resetta le scelte
+        emozioneSelezionata = null;
         votoTemporaneo = null;
         document.getElementById("btn-avanti").style.display = "none";
-        document.querySelectorAll(".rating-btn").forEach(b => b.classList.remove("selezionato"));
+        document.querySelectorAll(".emotion-btn, .rating-btn").forEach(b => b.classList.remove("selezionato"));
+    }
+
+    function selezionaEmozione(emozione, elementoBtn) {
+        emozioneSelezionata = emozione;
+        document.querySelectorAll(".emotion-btn").forEach(b => b.classList.remove("selezionato"));
+        elementoBtn.classList.add("selezionato");
+        verificaCompletamento();
     }
 
     function selezionaVoto(voto, elementoBtn) {
         votoTemporaneo = voto;
-        // Colora il tasto cliccato
         document.querySelectorAll(".rating-btn").forEach(b => b.classList.remove("selezionato"));
         elementoBtn.classList.add("selezionato");
-        // Mostra il tasto avanti
-        document.getElementById("btn-avanti").style.display = "inline-block";
+        verificaCompletamento();
+    }
+
+    function verificaCompletamento() {
+        // Mostra il tasto avanti solo se l'utente ha scelto sia l'emozione sia l'intensità
+        if (emozioneSelezionata !== null && votoTemporaneo !== null) {
+            document.getElementById("btn-avanti").style.display = "inline-block";
+        }
     }
 
     function prossimoVideo() {
+        const videoEl = document.getElementById("video-player");
+        if (videoEl) {
+            videoEl.pause();
+        }
+
         // Salva la risposta di questo video
         risposteUtente.push({
-            emozione: playlistUtente[indiceAttuale].emozione,
-            video: playlistUtente[indiceAttuale].url,
+            emozione: playlistUtente[indiceAttuale].emozione,       // Emozione originaria del video
+            emozioneReale: playlistUtente[indiceAttuale].emozione,  // Emozione originaria del video
+            emozioneScelta: emozioneSelezionata,                   // Emozione percepita dall'utente
+            video: playlistUtente[indiceAttuale].driveUrl,         // Link Google Drive originale
             voto: votoTemporaneo
         });
 
