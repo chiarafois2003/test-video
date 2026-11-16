@@ -28,6 +28,41 @@
             padding: 28px 24px;
             border-radius: 12px;
             box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
+            position: relative;
+        }
+
+        /* Selettore Lingua IT / EN */
+        .lang-switch-container {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 15px;
+        }
+
+        .lang-switch {
+            display: inline-flex;
+            background: #e9ecef;
+            border-radius: 20px;
+            padding: 3px;
+            border: 1px solid #ced4da;
+        }
+
+        .lang-btn {
+            border: none;
+            background: transparent;
+            padding: 5px 14px;
+            font-size: 13px;
+            font-weight: 700;
+            color: #495057;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            touch-action: manipulation;
+        }
+
+        .lang-btn.active {
+            background: #007BFF;
+            color: #ffffff;
+            box-shadow: 0 2px 6px rgba(0, 123, 255, 0.35);
         }
 
         h2 {
@@ -318,25 +353,33 @@
 <body>
 
 <div id="contenitore">
+    <!-- Switch Lingua IT / EN -->
+    <div class="lang-switch-container">
+        <div class="lang-switch" role="group" aria-label="Selettore Lingua">
+            <button type="button" class="lang-btn active" id="btn-lang-it" onclick="cambiaLingua('it')">IT</button>
+            <button type="button" class="lang-btn" id="btn-lang-en" onclick="cambiaLingua('en')">EN</button>
+        </div>
+    </div>
+
     <!-- Schermata di caricamento iniziale -->
     <h2 id="titolo-caricamento">Caricamento test in corso...</h2>
 
     <!-- Schermata iniziale di introduzione -->
     <div id="schermata-iniziale" style="display: none;">
-        <h2>Test sulle aree emotive</h2>
+        <h2 id="intro-titolo">Test sulle aree emotive</h2>
         <div class="box-intro">
-            <p>Ciao! Siamo un gruppo di studenti del corso di Design della Comunicazione presso il Politecnico di Milano. Questo test fa parte di una ricerca per il nostro progetto di <strong>Speculative Design</strong>.</p>
+            <p id="intro-p1">Ciao! Siamo un gruppo di studenti del corso di Design della Comunicazione presso il Politecnico di Milano. Questo test fa parte di una ricerca per il nostro progetto di <strong>Speculative Design</strong>.</p>
             
-            <p><strong>Cosa ti aspetta:</strong></p>
+            <p id="intro-p2"><strong>Cosa ti aspetta:</strong></p>
             <ul>
-                <li>Visualizzerai <strong>5 brevi video</strong> estratti casualmente.</li>
-                <li>Per ogni video ti chiederemo di indicare <strong>quale emozione</strong> viene rappresentata secondo te e di valutarne l'<strong>intensità</strong>.</li>
-                <li>Il test richiederà circa <strong>3 minuti</strong> in totale.</li>
+                <li id="intro-li1">Visualizzerai <strong>5 brevi video</strong> estratti casualmente.</li>
+                <li id="intro-li2">Per ogni video ti chiederemo di indicare <strong>quale emozione</strong> viene rappresentata secondo te e di valutarne l'<strong>intensità</strong> percepita.</li>
+                <li id="intro-li3">Il test richiederà circa <strong>3 minuti</strong> in totale.</li>
             </ul>
 
-            <p>🎧 Ti consigliamo di indossare le <strong>cuffie</strong> per un'esperienza più immersiva.</p>
+            <p id="intro-cuffie">🎧 Ti consigliamo di indossare le <strong>cuffie</strong> per un'esperienza più immersiva.</p>
 
-            <div class="warning-box">
+            <div id="intro-warning" class="warning-box">
                 ⚠️ <strong>Trigger Warning:</strong> Alcuni video potrebbero contenere scene dal contenuto <strong>esplicito</strong>. Se in qualunque momento non dovessi sentirti a tuo agio, puoi liberamente interrompere il video e procedere con il test.
             </div>
         </div>
@@ -362,12 +405,12 @@
             </div>
         </div>
         
-        <h3>Quale emozione vedi rappresentata nel video?</h3>
+        <h3 id="domanda-emozione">Quale emozione vedi rappresentata nel video?</h3>
         <div id="pulsanti-emozione">
             <!-- Pulsanti emozioni generati dal codice JavaScript -->
         </div>
 
-        <h3>Come valuti l'intensità di questo video? (1 = Bassa, 5 = Alta)</h3>
+        <h3 id="domanda-intensita">Come valuti l'intensità di questo video? (1 = Bassa, 5 = Alta)</h3>
         <div id="pulsanti-voto">
             <!-- Pulsanti generati dal codice JavaScript -->
         </div>
@@ -377,8 +420,8 @@
 
     <!-- Messaggio finale -->
     <div id="messaggio-fine" style="display: none;">
-        <h2>Test completato!</h2>
-        <p>Stiamo salvando i tuoi risultati...</p>
+        <h2 id="fine-titolo">Test completato!</h2>
+        <p id="fine-descrizione">Stiamo salvando i tuoi risultati...</p>
     </div>
 </div>
 
@@ -431,6 +474,132 @@
             { file: "videos/paura_6.mp4", driveUrl: "https://drive.google.com/file/d/1T7oWFAgOL1EDgvXs2UwohscKyhd1hynJ/preview" }
         ]
     };
+
+    const traduzioni = {
+        it: {
+            caricamento: "Caricamento test in corso...",
+            introTitolo: "Test sulle aree emotive",
+            introP1: "Ciao! Siamo un gruppo di studenti del corso di Design della Comunicazione presso il Politecnico di Milano. Questo test fa parte di una ricerca per il nostro progetto di <strong>Speculative Design</strong>.",
+            introP2: "<strong>Cosa ti aspetta:</strong>",
+            introLi1: "Visualizzerai <strong>5 brevi video</strong> estratti casualmente.",
+            introLi2: "Per ogni video ti chiederemo di indicare <strong>quale emozione</strong> viene rappresentata secondo te e di valutarne l'<strong>intensità</strong> percepita.",
+            introLi3: "Il test richiederà circa <strong>3 minuti</strong> in totale.",
+            introCuffie: "🎧 Ti consigliamo di indossare le <strong>cuffie</strong> per un'esperienza più immersiva.",
+            introWarning: "⚠️ <strong>Trigger Warning:</strong> Alcuni video potrebbero contenere scene dal contenuto <strong>esplicito</strong>. Se in qualunque momento non dovessi sentirti a tuo agio, puoi liberamente interrompere il video e procedere con il test.",
+            btnInizia: "Inizia il Test",
+            videoTitolo: (att, tot) => `Video ${att} di ${tot}`,
+            domandaEmozione: "Quale emozione vedi rappresentata nel video?",
+            domandaIntensita: "Come valuti l'intensità di questo video? (1 = Bassa, 5 = Alta)",
+            btnAvanti: "Prossimo Video",
+            fineTitolo: "Test completato!",
+            fineSalvataggio: "Stiamo salvando i tuoi risultati...",
+            fineGrazie: "<h2>Grazie!</h2><p>Le tue risposte sono state registrate con successo.</p>",
+            fineErrore: "<h2>Errore</h2><p>C'è stato un problema nel salvataggio. Riprova.</p>",
+            fineRete: "<h2>Errore di rete</h2><p>Controlla la tua connessione.</p>",
+            emozioni: {
+                Gioia: "Gioia",
+                Tristezza: "Tristezza",
+                Disgusto: "Disgusto",
+                Paura: "Paura",
+                Rabbia: "Rabbia"
+            }
+        },
+        en: {
+            caricamento: "Loading test in progress...",
+            introTitolo: "Emotional Areas Test",
+            introP1: "Hello! We are a group of Communication Design students at Politecnico di Milano. This test is part of a research for our <strong>Speculative Design</strong> project.",
+            introP2: "<strong>What to expect:</strong>",
+            introLi1: "You will watch <strong>5 short videos</strong> selected at random.",
+            introLi2: "For each video, we will ask you to indicate <strong>which emotion</strong> is represented in your opinion and evaluate its perceived <strong>intensity</strong>.",
+            introLi3: "The test will take about <strong>3 minutes</strong> in total.",
+            introCuffie: "🎧 We recommend wearing <strong>headphones</strong> for a more immersive experience.",
+            introWarning: "⚠️ <strong>Trigger Warning:</strong> Some videos may contain <strong>explicit</strong> content. If at any point you feel uncomfortable, you are free to stop the video and proceed with the test.",
+            btnInizia: "Start Test",
+            videoTitolo: (att, tot) => `Video ${att} of ${tot}`,
+            domandaEmozione: "Which emotion do you see represented in the video?",
+            domandaIntensita: "How do you rate the intensity of this video? (1 = Low, 5 = High)",
+            btnAvanti: "Next Video",
+            fineTitolo: "Test completed!",
+            fineSalvataggio: "Saving your results...",
+            fineGrazie: "<h2>Thank you!</h2><p>Your responses have been successfully recorded.</p>",
+            fineErrore: "<h2>Error</h2><p>There was a problem saving your results. Please try again.</p>",
+            fineRete: "<h2>Network Error</h2><p>Please check your connection.</p>",
+            emozioni: {
+                Gioia: "Joy",
+                Tristezza: "Sadness",
+                Disgusto: "Disgust",
+                Paura: "Fear",
+                Rabbia: "Anger"
+            }
+        }
+    };
+
+    let linguaAttuale = "it";
+
+    function cambiaLingua(lang) {
+        linguaAttuale = lang;
+        document.documentElement.lang = lang;
+
+        // Aggiorna pulsanti switch
+        const btnIt = document.getElementById("btn-lang-it");
+        const btnEn = document.getElementById("btn-lang-en");
+        if (btnIt && btnEn) {
+            btnIt.classList.toggle("active", lang === "it");
+            btnEn.classList.toggle("active", lang === "en");
+        }
+
+        const t = traduzioni[lang];
+
+        // Schermata caricamento
+        const titCaricamento = document.getElementById("titolo-caricamento");
+        if (titCaricamento) titCaricamento.innerText = t.caricamento;
+
+        // Schermata introduzione
+        const introTit = document.getElementById("intro-titolo");
+        if (introTit) introTit.innerText = t.introTitolo;
+        const introP1 = document.getElementById("intro-p1");
+        if (introP1) introP1.innerHTML = t.introP1;
+        const introP2 = document.getElementById("intro-p2");
+        if (introP2) introP2.innerHTML = t.introP2;
+        const introLi1 = document.getElementById("intro-li1");
+        if (introLi1) introLi1.innerHTML = t.introLi1;
+        const introLi2 = document.getElementById("intro-li2");
+        if (introLi2) introLi2.innerHTML = t.introLi2;
+        const introLi3 = document.getElementById("intro-li3");
+        if (introLi3) introLi3.innerHTML = t.introLi3;
+        const introCuffie = document.getElementById("intro-cuffie");
+        if (introCuffie) introCuffie.innerHTML = t.introCuffie;
+        const introWarning = document.getElementById("intro-warning");
+        if (introWarning) introWarning.innerHTML = t.introWarning;
+        const btnInizia = document.getElementById("btn-inizia");
+        if (btnInizia) btnInizia.innerText = t.btnInizia;
+
+        // Schermata video
+        const domEmozione = document.getElementById("domanda-emozione");
+        if (domEmozione) domEmozione.innerText = t.domandaEmozione;
+        const domIntensita = document.getElementById("domanda-intensita");
+        if (domIntensita) domIntensita.innerText = t.domandaIntensita;
+        const btnAvanti = document.getElementById("btn-avanti");
+        if (btnAvanti) btnAvanti.innerText = t.btnAvanti;
+
+        if (playlistUtente.length > 0) {
+            document.getElementById("titolo").innerText = t.videoTitolo(indiceAttuale + 1, 5);
+        }
+
+        // Aggiorna etichette dei pulsanti emozione
+        document.querySelectorAll(".emotion-btn").forEach(btn => {
+            const emoChiave = btn.getAttribute("data-emozione");
+            if (emoChiave && t.emozioni[emoChiave]) {
+                btn.innerText = t.emozioni[emoChiave];
+            }
+        });
+
+        // Schermata finale
+        const fineTit = document.getElementById("fine-titolo");
+        if (fineTit) fineTit.innerText = t.fineTitolo;
+        const fineDesc = document.getElementById("fine-descrizione");
+        if (fineDesc) fineDesc.innerText = t.fineSalvataggio;
+    }
 
     const listaEmozioni = ["Gioia", "Tristezza", "Disgusto", "Paura", "Rabbia"];
 
@@ -503,9 +672,11 @@
 
         // Generiamo i tasti per le emozioni
         const contenitoreEmozioni = document.getElementById("pulsanti-emozione");
+        contenitoreEmozioni.innerHTML = "";
         listaEmozioni.forEach(emozione => {
             let btn = document.createElement("button");
-            btn.innerText = emozione;
+            btn.innerText = traduzioni[linguaAttuale].emozioni[emozione];
+            btn.setAttribute("data-emozione", emozione);
             btn.className = "emotion-btn";
             btn.onclick = () => selezionaEmozione(emozione, btn);
             contenitoreEmozioni.appendChild(btn);
@@ -596,7 +767,7 @@
 
     function mostraVideo() {
         window.scrollTo({ top: 0, behavior: "smooth" });
-        document.getElementById("titolo").innerText = `Video ${indiceAttuale + 1} di 5`;
+        document.getElementById("titolo").innerText = traduzioni[linguaAttuale].videoTitolo(indiceAttuale + 1, 5);
         document.getElementById("player-container").style.display = "block";
         
         haFinitoRiproduzione = false;
@@ -642,10 +813,11 @@
         }
 
         // Salva la risposta di questo video
+        const emozioneTradotta = traduzioni[linguaAttuale].emozioni[emozioneSelezionata] || emozioneSelezionata;
         risposteUtente.push({
             emozione: playlistUtente[indiceAttuale].emozione,       // Emozione originaria del video
             emozioneReale: playlistUtente[indiceAttuale].emozione,  // Emozione originaria del video
-            emozioneScelta: emozioneSelezionata,                   // Emozione percepita dall'utente
+            emozioneScelta: emozioneTradotta,                      // Emozione percepita dall'utente (nella lingua scelta)
             video: playlistUtente[indiceAttuale].driveUrl,         // Link Google Drive originale
             voto: votoTemporaneo
         });
@@ -679,14 +851,16 @@
         })
         .then(response => response.json())
         .then(data => {
+            const t = traduzioni[linguaAttuale];
             if(data.status === "successo") {
-                msgFine.innerHTML = "<h2>Grazie!</h2><p>Le tue risposte sono state registrate con successo.</p>";
+                msgFine.innerHTML = t.fineGrazie;
             } else {
-                msgFine.innerHTML = "<h2>Errore</h2><p>C'è stato un problema nel salvataggio. Riprova.</p>";
+                msgFine.innerHTML = t.fineErrore;
             }
         })
         .catch(error => {
-            msgFine.innerHTML = "<h2>Errore di rete</h2><p>Controlla la tua connessione.</p>";
+            const t = traduzioni[linguaAttuale];
+            msgFine.innerHTML = t.fineRete;
         });
     }
 
