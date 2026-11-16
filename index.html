@@ -33,9 +33,11 @@
 
         /* Selettore Lingua IT / EN */
         .lang-switch-container {
-            display: flex;
-            justify-content: flex-end;
-            margin-bottom: 15px;
+            position: absolute;
+            top: 24px;
+            right: 24px;
+            z-index: 10;
+            margin: 0;
         }
 
         .lang-switch {
@@ -70,6 +72,7 @@
             margin-top: 0;
             margin-bottom: 16px;
             color: #222;
+            padding: 0 75px;
         }
 
         h3 {
@@ -315,8 +318,19 @@
                 border-radius: 10px;
             }
 
+            .lang-switch-container {
+                top: 14px;
+                right: 14px;
+            }
+
+            .lang-btn {
+                padding: 4px 10px;
+                font-size: 12px;
+            }
+
             h2 {
                 font-size: 1.25rem;
+                padding: 0 60px;
             }
 
             h3 {
@@ -812,12 +826,11 @@
             videoEl.pause();
         }
 
-        // Salva la risposta di questo video
-        const emozioneTradotta = traduzioni[linguaAttuale].emozioni[emozioneSelezionata] || emozioneSelezionata;
+        // Salva la risposta di questo video (sempre in italiano per l'analisi Excel)
         risposteUtente.push({
             emozione: playlistUtente[indiceAttuale].emozione,       // Emozione originaria del video
             emozioneReale: playlistUtente[indiceAttuale].emozione,  // Emozione originaria del video
-            emozioneScelta: emozioneTradotta,                      // Emozione percepita dall'utente (nella lingua scelta)
+            emozioneScelta: emozioneSelezionata,                   // Emozione percepita (sempre in italiano per le analisi)
             video: playlistUtente[indiceAttuale].driveUrl,         // Link Google Drive originale
             voto: votoTemporaneo
         });
